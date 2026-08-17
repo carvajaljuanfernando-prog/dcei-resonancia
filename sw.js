@@ -1,7 +1,7 @@
 /* Service worker — caché offline de la aplicación.
    Al publicar una versión nueva, suba el número de VERSION: eso invalida la caché
    anterior y hace que los usuarios reciban la actualización. */
-const VERSION = '2026.08.18-1';
+const VERSION = '2026.08.18-3';
 const CACHE = 'dcei-rm-' + VERSION;
 
 const ASSETS = [
@@ -59,7 +59,8 @@ self.addEventListener('fetch', e => {
 
   // Motor de OCR: archivos grandes e inmutables. Caché estricta, sin revalidar,
   // para no volver a descargar varios MB en cada visita.
-  if (url.pathname.indexOf('/vendor/') !== -1) {
+  if (url.pathname.indexOf('/vendor/') !== -1 ||
+      /(tesseract[\w.-]*\.js|\.traineddata\.gz)$/.test(url.pathname)) {
     e.respondWith(
       caches.match(req).then(hit => hit || fetch(req).then(res => {
         if (res && res.status === 200) {
